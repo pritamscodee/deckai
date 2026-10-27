@@ -1,0 +1,39 @@
+.gitignore
+  s_0dd30851ae1f56::t_f5fc21537ad3e5 1-41
+README.md
+  s_0dd30851ae1f56::t_80e67c92a624ba 1-36
+app/globals.css
+  s_0dd30851ae1f56::t_3bbe4ea6c4acb4 1-26
+app/layout.tsx
+  s_0dd30851ae1f56::t_5bd59d288bdf8d 1-29
+app/page.tsx
+  s_0dd30851ae1f56::t_267dbd166ae0dd 1-69
+eslint.config.mjs
+  s_0dd30851ae1f56::t_7a1a55364fdf2d 1-18
+public/file.svg
+  s_0dd30851ae1f56::t_09f50bd96437b3 1
+public/globe.svg
+  s_0dd30851ae1f56::t_9630da0562a734 1
+public/next.svg
+  s_0dd30851ae1f56::t_7e1da544950d8c 1
+public/vercel.svg
+  s_0dd30851ae1f56::t_ad195d4b227bae 1
+public/window.svg
+  s_0dd30851ae1f56::t_ee88118958b94b 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "79bf3b596d1e46ff48431c4c42394c0f0468cf65",
+  "prompts": {},
+  "sessions": {
+    "s_0dd30851ae1f56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7109ff12-9d22-47a9-816d-ddf30ec3799c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
