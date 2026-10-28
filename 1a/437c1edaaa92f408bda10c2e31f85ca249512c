@@ -1,0 +1,30 @@
+app/actions.ts
+  s_f5d54905dccf56::t_fe937f34ecef29 13
+  s_f5d54905dccf56::t_bda1ea001cac93 154
+scripts/razorpay-plans.mjs
+  s_f5d54905dccf56::t_47f94769b3317e 11
+  s_f5d54905dccf56::t_15db54ae501eb0 2-4,8-10,12
+lib/razorpay.ts
+  s_f5d54905dccf56::t_25d99f2141db72 3-17,20,23,46,48-49,51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1a437c1edaaa92f408bda10c2e31f85ca249512c",
+  "prompts": {},
+  "humans": {
+    "h_8dfeaef981cbe6": {
+      "author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_f5d54905dccf56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af0a7e70-c780-432d-a776-ad41daf00c59",
+        "model": "claude-opus-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
