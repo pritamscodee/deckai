@@ -115,7 +115,10 @@ export async function saveSlide(slideId: string, scene: Prisma.InputJsonValue) {
     // The shape is checked rather than trusted: the slide renderer reads these fields directly.
     const parsed = Slide.safeParse(scene.slide);
     if (!parsed.success) return { error: "That edit didn't look like a slide, so it wasn't saved." };
-    card = { ...parsed.data, illustration: scene.slide.illustration, drawing: scene.slide.drawing, image: scene.slide.image };
+    // Slide only validates the layout fields; the extras hang off SlideT and are carried
+    // across by hand, so anything missing here is silently dropped on every edit.
+    card = { ...parsed.data, illustration: scene.slide.illustration, drawing: scene.slide.drawing,
+      image: scene.slide.image, card: scene.slide.card };
   }
   await db.slide.updateMany({
     where: { id: slideId, deck: { ownerId: user.id } },

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useId, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { CARD_VIEWBOX, ILLUSTRATION_VIEWBOX, cardMarkup, decorationMarkup, illustrationMarkup } from "@/lib/doodles";
+import { CARD_BUTTONS, ILLUSTRATION_PILLS, ILLUSTRATION_VIEWBOX, decorationMarkup, illustrationMarkup } from "@/lib/doodles";
 import { DrawingLayer } from "@/components/slide-drawing";
 import type { SlideT, Theme } from "@/lib/slide-schema";
 
@@ -111,14 +111,42 @@ function WithPicture({ slide, className, children }: { slide: SlideT; className?
   );
 }
 
-// The labelled mock-up: vector, so its text stays sharp and correctly spelled at any size.
+// The labelled mock-up, built from the same sketch/sticky styling the card layout uses, so a
+// theme restyles it for free. Every label goes through T: the slide promises that each word
+// stays editable, which a drawn SVG could not keep.
 function CardPicture({ slide }: { slide: SlideT }) {
-  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
   if (!slide.card) return null;
+  const { title, rows, buttons } = slide.card;
   return (
-    <svg viewBox={CARD_VIEWBOX} className={cn("size-full min-h-0", slide.drawing && "invisible")}
-      aria-hidden data-drawing="card"
-      dangerouslySetInnerHTML={{ __html: cardMarkup(slide.card, uid, "var(--slide-body)") }} />
+    <div className={cn("flex min-h-0 items-center gap-[0.8cqw]", slide.drawing && "invisible")} data-drawing="card">
+      {/* Points in from the text, so the card reads as the thing the words just described. */}
+      <svg viewBox="0 0 48 60" aria-hidden className="h-[7cqw] w-[2.8cqw] shrink-0 text-[var(--slide-accent)]">
+        <path d="M3 8C3 36 14 46 34 48" fill="none" stroke="currentColor" strokeWidth="4"
+          strokeLinecap="round" strokeDasharray="7 7" />
+        <path d="M26 41l10 7-10 7" fill="none" stroke="currentColor" strokeWidth="4"
+          strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <div className="sketch sticky flex w-full flex-col gap-[0.7cqw] p-[1.3cqw]">
+        {title && (
+          <div className="sketch px-[1cqw] py-[0.45cqw] text-center text-[1.7cqw] font-bold"
+            style={{ background: ILLUSTRATION_PILLS[0] }}>
+            <T path={["card", "title"]} value={title} />
+          </div>
+        )}
+        {rows.map((row, i) => (
+          <div key={i} className="sketch px-[1cqw] py-[0.45cqw] text-[1.5cqw]"
+            style={{ background: ILLUSTRATION_PILLS[(i + 1) % ILLUSTRATION_PILLS.length] }}>
+            <T path={["card", "rows", i]} value={row} />
+          </div>
+        ))}
+        {buttons.map((button, i) => (
+          <div key={i} className="sketch px-[1cqw] py-[0.45cqw] text-center text-[1.5cqw]"
+            style={{ background: CARD_BUTTONS[i % CARD_BUTTONS.length] }}>
+            <T path={["card", "buttons", i]} value={button} />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -148,6 +176,21 @@ function Grid({ count, children, className = "h-full" }: { count: number; childr
   return <div className={cn("grid gap-[2cqw]", className)} style={{ gridTemplateColumns: `repeat(${Math.min(count, 4)}, minmax(0, 1fr))` }}>{children}</div>;
 }
 
+// A small dashed hook pointing into a line. It sits in the bullet's own marker slot, so it
+// tracks the line it belongs to through any wrap or resize, rather than being placed by
+// slide coordinates that stop matching as soon as the text reflows.
+function BulletHook() {
+  return (
+    <svg viewBox="0 0 48 44" aria-hidden
+      className="mt-[0.45cqw] h-[2.1cqw] w-[2.3cqw] shrink-0 text-[var(--slide-accent)]">
+      <path d="M5 3C5 23 13 32 32 33" fill="none" stroke="currentColor" strokeWidth="4"
+        strokeLinecap="round" strokeDasharray="7 7" />
+      <path d="M24 26l10 7-10 7" fill="none" stroke="currentColor" strokeWidth="4"
+        strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function Body({ slide }: { slide: Exclude<SlideT, { layout: "title" }> }) {
   switch (slide.layout) {
     case "bullets":
@@ -157,7 +200,7 @@ function Body({ slide }: { slide: Exclude<SlideT, { layout: "title" }> }) {
           <ul className="flex flex-col gap-[1cqw]">
             {slide.bullets.map((b, i) => (
               <li key={i} className="flex gap-[1cqw]">
-                <span className={startsWithEmoji(b) ? "" : "text-[var(--slide-accent)]"}>•</span><T path={["bullets", i]} value={b} />
+                <BulletHook /><T path={["bullets", i]} value={b} />
               </li>
             ))}
           </ul>
