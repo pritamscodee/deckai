@@ -56,7 +56,7 @@ export type SlideT = z.infer<typeof Slide> & {
 export const ILLUSTRATED: SlideT["layout"][] = ["title", "bullets", "quote", "stats"];
 
 // Illustration Claude drew for the slide, shown beside the content; only these layouts have room.
-// url is an SVG data URL (Claude writes SVG; Anthropic has no image model).
+// url points at the illustration on ImageKit, drawn by OpenAI's image model.
 export type SlideImage = { url: string; prompt: string };
 export const IMAGED: SlideT["layout"][] = ["title", "bullets", "quote"];
 

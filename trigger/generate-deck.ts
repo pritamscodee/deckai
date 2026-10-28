@@ -1,25 +1,34 @@
 import { task, metadata, logger, AbortTaskRunError } from "@trigger.dev/sdk";
-import { generateText, Output, APICallError, RetryError } from "ai";
+import { generateImage, generateText, Output, APICallError, RetryError } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import type { z } from "zod";
 import { IMAGED, Outline, SlideOutput, slideText, toSlide, type CardScene, type Theme } from "@/lib/slide-schema";
 import { slideToSvg, uploadToImageKit } from "@/lib/slide-svg";
 import { db } from "@/lib/db";
 import { activePlan } from "@/lib/plans";
-import { IMAGE_INSTRUCTION, OUTLINE_INSTRUCTION, SLIDE_INSTRUCTION } from "./prompt";
+import { ILLUSTRATION_STYLE, OUTLINE_INSTRUCTION, SLIDE_INSTRUCTION } from "./prompt";
 
 // Haiku is the lowest-cost Claude model.
 const model = anthropic("claude-haiku-5-5");
 
-// Anthropic has no image model, so Claude draws the slide's illustration as SVG.
-// Stored as a data URL: small, and shown through <img> so any markup in it can't run.
-async function drawIllustration(prompt: string) {
-  const { text } = await generateText({ model, system: IMAGE_INSTRUCTION, prompt });
-  let svg = text.match(/<svg[\s\S]*<\/svg>/)?.[0];
-  if (!svg) return null;
-  // <img> only renders SVG that declares its namespace.
-  if (!svg.includes("xmlns=")) svg = svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
-  return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
+// Illustrations come from OpenAI's image model. gpt-image-1-mini at "low" quality is the
+// cheapest of them, which matters because a deck draws one of these per illustrated slide.
+// The bytes go to ImageKit rather than into the slide as a data URI: the scene JSON is
+// capped (see saveSlide) and a deck's worth of inline images would bloat every row.
+async function drawIllustration(prompt: string, baseName: string, folder: string) {
+  const { image, warnings } = await generateImage({
+    model: openai.image("gpt-image-1-mini"),
+    prompt: `${ILLUSTRATION_STYLE}
+
+Draw this scene: ${prompt}`,
+    size: "1024x1024",
+    providerOptions: { openai: { quality: "low", background: "transparent", outputFormat: "webp" } },
+  });
+  // A dropped option (transparency, webp) still yields a usable picture, so it's a note not a failure.
+  if (warnings.length) logger.warn("Illustration options not applied", { warnings });
+  const ext = image.mediaType.split("/")[1] ?? "png";
+  return uploadToImageKit(image.uint8Array, `${baseName}.${ext}`, folder, image.mediaType);
 }
 
 // Anthropic answers 400 "Your credit balance is too low" when the account has no credit left.
@@ -80,7 +89,7 @@ Layout: ${s.layout}`,
         // Drawn before saving so the slide isn't rewritten under someone editing it.
         if (imagePrompt && IMAGED.includes(card.layout)) {
           try {
-            const url = await drawIllustration(imagePrompt);
+            const url = await drawIllustration(imagePrompt, `illustration-${i}`, `/decks/${deckId}`);
             if (url) card.image = { url, prompt: imagePrompt };
           } catch (err) {
             if (isOutOfCredit(err)) throw err;

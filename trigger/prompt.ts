@@ -50,7 +50,7 @@ imagePrompt (only for title, bullets and quote; null for other layouts):
 - An illustration drawn for this slide and shown beside the text. Set it only when a picture
   genuinely helps the idea (the title slide almost always); otherwise null.
 - Describe one clear scene or object in 1–2 sentences, e.g. "A friendly robot sorting colorful
-  letters into labeled boxes". Keep it simple enough to draw with basic shapes; no text in it.
+  letters into labeled boxes". Describe only what is in the picture; it must contain no text.
 
 Diagram layout only (1600x900 canvas):
 - The title is drawn at the top; keep nodes between y=160 and y=800
@@ -62,12 +62,14 @@ Diagram layout only (1600x900 canvas):
 notes: 2–4 sentences the presenter can say aloud.`;
 
 
-export const IMAGE_INSTRUCTION = `You are an illustrator who draws with SVG code.
+// Style preamble for the image model. OpenAI's gpt-image-1-mini draws the picture itself, so
+// this describes a look rather than the SVG rules Claude used to need. Transparent background
+// so one illustration sits correctly on every theme.
+export const ILLUSTRATION_STYLE = `A hand-drawn illustration in a friendly notebook-sketch style.
 
-Draw the scene you are given as ONE flat, friendly, hand-drawn-notebook style illustration:
-- Reply with only the SVG markup: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600"> ... </svg>
-- Basic shapes and paths only (rect, circle, ellipse, path, polygon, line); no <text>, <image>, <script>, <foreignObject> or external links
-- Soft pastel fills (#a5d8ff, #b2f2bb, #ffec99, #ffc9c9, #d0bfff, #ffc078, #e9ecef) with dark #1f2328 outlines, stroke-width 4, round line caps
-- Transparent background; fill most of the canvas with the subject, centered
-- Keep it simple and readable: 1 main subject and at most 3 supporting objects
-- Valid XML: every tag closed, attributes quoted, no "&" characters`;
+- Thick dark #1f2328 ink outlines with rounded ends, loose and slightly uneven, as if drawn by hand with a felt pen
+- Filled with soft flat pastel colour: dusty blue, mint, butter yellow, blush pink, lilac, peach
+- Flat 2D and simple: no gradients, no shading, no texture, no photorealism, no 3D render
+- Fully transparent background
+- One clear main subject, centred, filling most of the frame, with at most three supporting objects
+- No text, letters, numbers, labels or logos anywhere in the image`;

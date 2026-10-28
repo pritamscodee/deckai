@@ -79,9 +79,18 @@ ${ill && slide.layout !== "diagram" ? `<g transform="translate(100 ${isTitle ? 5
 }
 
 // Uploads via ImageKit's REST upload API (no SDK needed).
-export async function uploadToImageKit(svg: string, fileName: string, folder: string) {
+// Takes an SVG string (slide thumbnails) or raw bytes (generated illustrations); the media
+// type defaults to SVG so thumbnail callers are unchanged.
+export async function uploadToImageKit(
+  data: string | Uint8Array,
+  fileName: string,
+  folder: string,
+  mediaType = "image/svg+xml",
+) {
   const form = new FormData();
-  form.append("file", new Blob([svg], { type: "image/svg+xml" }), fileName);
+  // Cast: bytes from the image model are typed over ArrayBufferLike, while BlobPart wants an
+  // ArrayBuffer-backed view. The data is identical either way.
+  form.append("file", new Blob([data as BlobPart], { type: mediaType }), fileName);
   form.append("fileName", fileName);
   form.append("folder", folder);
   form.append("useUniqueFileName", "false");

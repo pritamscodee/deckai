@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.89",
+    "@ai-sdk/openai": "^4.0.104",
     "@base-ui/react": "^1.9.0",
     "@excalidraw/excalidraw": "^0.18.1",
     "@neondatabase/serverless": "^1.2.0",
