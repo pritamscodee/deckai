@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  decks         Deck[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  // Razorpay subscription; see lib/plans.ts. Usage resets each billing period.
+  plan               String? // starter | pro | ultra
+  subscriptionId     String?   @unique
+  subscriptionStatus String? // Razorpay status: created, active, cancelled, halted, ...
+  periodEnd          DateTime?
+  decksUsed          Int       @default(0)
+  slidesUsed         Int       @default(0)
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+enum DeckStatus {
+  QUEUED
+  GENERATING
+  READY
+  FAILED
+}
+
+model Deck {
+  id        String     @id @default(cuid())
+  title     String
+  slug      String // used for the export filename; decks are private, so it needn't be unique
+  prompt    String
+  status    DeckStatus @default(QUEUED)
+  runId     String? // Trigger.dev run id
+  outline   Json? // saved once so a retry continues instead of starting over
+  error     String? // why generation stopped, shown to the user
+  theme     String     @default("notebook") // notebook | clean | midnight
+  ownerId   String
+  owner     User       @relation(fields: [ownerId], references: [id])
+  slides    Slide[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([ownerId, createdAt])
+}
+
+model Slide {
+  id           String   @id @default(cuid())
+  deckId       String
+  deck         Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
+  order        Int
+  title        String
+  scene        Json // Excalidraw elements + appState + files
+  searchText   String   @default("") // all text on slide, for search
+  thumbnailUrl String? // ImageKit
+  notes        String?
+  updatedAt    DateTime @updatedAt
+
+  @@index([deckId, order])
+}

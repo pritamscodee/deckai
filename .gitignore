@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/lib/generated/prisma
+
+# trigger.dev build output
+.trigger
+
+# local agent tooling caches
+/.agents
+/.taste-skill
+/.windsurf
+/.claude/settings.local.json
+/.claude/skills
