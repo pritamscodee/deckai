@@ -1,0 +1,37 @@
+lib/slide-schema.ts
+  s_f5d54905dccf56::t_533fca19826618 59
+lib/slide-svg.ts
+  s_f5d54905dccf56::t_d8e6bd21781cba 82-84,86-89
+  s_f5d54905dccf56::t_41781bcd90349e 85,91-93
+trigger/prompt.ts
+  s_f5d54905dccf56::t_3a9dfefbf3c331 53,65-68,70-75
+trigger/generate-deck.ts
+  s_f5d54905dccf56::t_adfead86bd51f4 2,4,10,15-31,92
+trigger.config.ts
+  s_f5d54905dccf56::t_36b68171d441d5 6-8
+package.json
+  s_f5d54905dccf56::t_98501847cb0a06 15
+pnpm-lock.yaml
+  s_f5d54905dccf56::t_8d2a66ee666ce4 14-16,147-152,159-164,5198-5203,5208-5216
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1e1a872682f57b22b848a62d26367d77ebb39dfc",
+  "prompts": {},
+  "humans": {
+    "h_8dfeaef981cbe6": {
+      "author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_f5d54905dccf56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af0a7e70-c780-432d-a776-ad41daf00c59",
+        "model": "claude-opus-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
