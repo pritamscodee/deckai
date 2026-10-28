@@ -1,6 +1,13 @@
 import { applySubscription } from "@/lib/billing";
 import { verifyWebhook, type Subscription } from "@/lib/razorpay";
 
+// Razorpay validates a webhook URL by probing it before saving. The route is POST-only, so
+// a GET probe would answer 405 and the dashboard reports the URL as invalid — this answers it.
+// Doubles as a health check: it reveals nothing about configuration, since the URL is public.
+export function GET() {
+  return Response.json({ ok: true, endpoint: "razorpay-webhook" });
+}
+
 // Razorpay dashboard → Webhooks: point at /api/razorpay/webhook with the subscription.* events.
 // Keeps plans in sync for renewals, failed payments and cancellations.
 export async function POST(req: Request) {
