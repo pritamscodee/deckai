@@ -1,0 +1,29 @@
+components/slide-view.tsx
+  s_f5d54905dccf56::t_8459bcb80cc3f9 5,114-116,119,121-149
+  s_f5d54905dccf56::t_6f497bd7bd3cdf 179-193,203
+app/actions.ts
+  s_f5d54905dccf56::t_807047d21464c5 118-121
+lib/doodles.ts
+  s_f5d54905dccf56::t_33ccffcfc87acf 133-134,141-142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8d0570323cf5f41090021237d03bcd60e72151ad",
+  "prompts": {},
+  "humans": {
+    "h_8dfeaef981cbe6": {
+      "author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_f5d54905dccf56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af0a7e70-c780-432d-a776-ad41daf00c59",
+        "model": "claude-opus-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
