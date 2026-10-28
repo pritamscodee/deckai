@@ -12,18 +12,21 @@ import { ILLUSTRATION_STYLE, OUTLINE_INSTRUCTION, SLIDE_INSTRUCTION } from "./pr
 // Haiku is the lowest-cost Claude model.
 const model = anthropic("claude-haiku-5-5");
 
-// Illustrations come from OpenAI's image model. gpt-image-1-mini at "low" quality is the
-// cheapest of them, which matters because a deck draws one of these per illustrated slide.
+// Illustrations come from OpenAI's image model. gpt-image-1.5 at "medium" was chosen against
+// gpt-image-1-mini and gpt-image-2 on the same prompt: it draws the subject surrounded by the
+// related objects the style asks for, which is the look the decks want. gpt-image-2 was ruled
+// out outright — it refuses transparent backgrounds, so every illustration would arrive as a
+// white rectangle on the notebook paper. Costs about 4s more per slide than the mini model.
 // The bytes go to ImageKit rather than into the slide as a data URI: the scene JSON is
 // capped (see saveSlide) and a deck's worth of inline images would bloat every row.
 async function drawIllustration(prompt: string, baseName: string, folder: string) {
   const { image, warnings } = await generateImage({
-    model: openai.image("gpt-image-1-mini"),
+    model: openai.image("gpt-image-1.5"),
     prompt: `${ILLUSTRATION_STYLE}
 
 Draw this scene: ${prompt}`,
     size: "1024x1024",
-    providerOptions: { openai: { quality: "low", background: "transparent", outputFormat: "webp" } },
+    providerOptions: { openai: { quality: "medium", background: "transparent", outputFormat: "webp" } },
   });
   // A dropped option (transparency, webp) still yields a usable picture, so it's a note not a failure.
   if (warnings.length) logger.warn("Illustration options not applied", { warnings });
