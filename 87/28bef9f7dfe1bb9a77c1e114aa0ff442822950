@@ -1,0 +1,25 @@
+trigger/prompt.ts
+  s_f5d54905dccf56::t_d201e6b162af08 69-74,100-106
+  s_f5d54905dccf56::t_b6dffd6b973f5c 98-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8728bef9f7dfe1bb9a77c1e114aa0ff442822950",
+  "prompts": {},
+  "humans": {
+    "h_8dfeaef981cbe6": {
+      "author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_f5d54905dccf56": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af0a7e70-c780-432d-a776-ad41daf00c59",
+        "model": "claude-opus-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
