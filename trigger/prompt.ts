@@ -41,6 +41,17 @@ VISUAL PLANNING:
 - Reserve statistics for accurate, relevant numbers.
 - Do not force illustrations into ideas they cannot clarify.
 
+STRUCTURAL VARIETY:
+- Do not fall back on one default running order. Two decks on different
+  topics must not share the same sequence of layouts.
+- Let the subject choose the layouts: a historical topic may want timeline
+  and comparison; a technical one code and diagram; a human one quote and
+  cards. A topic with no trustworthy figures should have no stats slide.
+- Never include a layout just to cover the list, and do not assume the
+  second slide is always stats or the last is always cards.
+- Decide the shape of the deck from the topic first, then pick layouts
+  that carry it.
+
 Return a short, specific deckTitle and the ordered slide outline.
 `;
 

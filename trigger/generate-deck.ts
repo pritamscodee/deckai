@@ -49,6 +49,20 @@ export const generateDeck = task({
     });
     // Slides already saved by an earlier attempt are kept, not paid for twice.
     const done = new Set(deck.slides.map(s => s.order));
+    // Each slide is its own model call, so the model cannot see what earlier slides drew.
+    // Without this list "do not repeat a previous illustration" is unfollowable, and a deck
+    // ends up with the same subject drawn on several slides. Seeded on a retry from the
+    // slides already saved, so continuing a deck doesn't start the comparison over.
+    const drawnSoFar: string[] = [];
+    if (done.size) {
+      const saved = await db.slide.findMany({
+        where: { deckId }, orderBy: { order: "asc" }, select: { scene: true },
+      });
+      for (const row of saved) {
+        const prompt = (row.scene as { slide?: { image?: { prompt?: string } } })?.slide?.image?.prompt;
+        if (prompt) drawnSoFar.push(prompt);
+      }
+    }
 
     try {
       let outline = deck.outline as z.infer<typeof Outline> | null;
@@ -82,10 +96,15 @@ export const generateDeck = task({
 Slide ${i + 1} of ${outline.slides.length}
 Title: ${s.title}
 Key idea: ${s.keyIdea}
-Layout: ${s.layout}`,
+Layout: ${s.layout}${drawnSoFar.length ? `
+
+Illustrations already used earlier in this deck. Choose a different subject and
+composition; do not draw any of these again:
+${drawnSoFar.map((d, n) => `${n + 1}. ${d}`).join("\n")}` : ""}`,
         });
         const card = toSlide(output);
         const { notes, imagePrompt } = output;
+        if (imagePrompt) drawnSoFar.push(imagePrompt);
         // Drawn before saving so the slide isn't rewritten under someone editing it.
         if (imagePrompt && IMAGED.includes(card.layout)) {
           try {
