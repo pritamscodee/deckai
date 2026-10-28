@@ -39,7 +39,10 @@ export async function createDeck(formData: FormData) {
   try {
     const handle = await tasks.trigger<typeof generateDeck>("generate-deck", { deckId: deck.id, prompt }, { priority: plan.priority });
     await db.deck.update({ where: { id: deck.id }, data: { runId: handle.id } });
-  } catch {
+  } catch (err) {
+    // The user gets a calm message, but the cause has to reach the server log: a queue
+    // failure is always configuration (key, environment, deployment), never a one-off.
+    console.error("[trigger] could not queue deck", { deckId: deck.id, err: String(err) });
     // Nothing was generated, so the deck shouldn't count against the month.
     await db.$transaction([
       db.deck.update({ where: { id: deck.id }, data: { status: "FAILED", error: "The deck couldn't be queued. Nothing was counted against your plan — try again." } }),
@@ -74,7 +77,8 @@ export async function retryDeck(deckId: string) {
   try {
     const handle = await tasks.trigger<typeof generateDeck>("generate-deck", { deckId: deck.id, prompt: deck.prompt }, { priority: plan.priority });
     await db.deck.update({ where: { id: deck.id }, data: { runId: handle.id } });
-  } catch {
+  } catch (err) {
+    console.error("[trigger] could not re-queue deck", { deckId: deck.id, err: String(err) });
     await db.deck.update({ where: { id: deck.id }, data: { status: "FAILED", error: "Couldn't start generating again. Nothing was counted against your plan." } });
     if (recharge) await db.user.updateMany({ where: { id: owner.id, decksUsed: { gt: 0 } }, data: { decksUsed: { decrement: 1 } } });
   }
