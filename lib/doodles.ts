@@ -127,3 +127,57 @@ export function decorationMarkup(seed: number) {
     spiral(flip ? 1500 : 110, 820, "#ff922b"),
   ].join("");
 }
+
+
+// A labelled card: the hand-drawn mock-up of a real thing (an order, a profile, a record),
+// with its fields as pills and its actions as buttons. Drawn as vector rather than generated
+// as an image, so the labels stay sharp and spelled correctly.
+export type SlideCard = {
+  title: string | null;
+  rows: string[];
+  buttons: string[];
+};
+
+export const CARD_VIEWBOX = "0 0 440 620";
+const CARD_BUTTONS = ["#ffc9a8", "#dee2e6", "#d0bfff"];
+
+// Its own wobble region: the shared one is sized for the 1000x260 strip and would clip a card.
+const cardDefs = (uid: string) =>
+  `<defs><filter id="${uid}cw" filterUnits="userSpaceOnUse" x="-20" y="-20" width="480" height="660">` +
+  `<feTurbulence baseFrequency="0.025" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2"/></filter></defs>`;
+
+export function cardMarkup(card: SlideCard, uid: string, font: string) {
+  const rows = card.rows.slice(0, 4);
+  const buttons = card.buttons.slice(0, 3);
+  const out: string[] = [cardDefs(uid)];
+
+  // Offset fill behind an outlined panel, the same trick the callout box uses.
+  out.push(`<g filter="url(#${uid}cw)">`);
+  out.push(`<rect x="30" y="32" width="392" height="560" rx="20" fill="#ffe8cc"/>`);
+  out.push(`<rect x="20" y="20" width="392" height="560" rx="20" fill="#ffffff" stroke="${ink}" stroke-width="4"/>`);
+
+  let y = 52;
+  if (card.title) {
+    out.push(`<rect x="44" y="${y}" width="344" height="58" rx="10" fill="#ffec99" stroke="${ink}" stroke-width="3"/>`);
+    out.push(`<text x="216" y="${y + 39}" text-anchor="middle" font-size="30" font-family="${font}" fill="${ink}">${esc(card.title)}</text>`);
+    y += 82;
+  }
+
+  for (const [i, row] of rows.entries()) {
+    const label = wrap(row, 18)[0] ?? row;
+    out.push(`<rect x="44" y="${y}" width="344" height="54" rx="14" fill="${ILLUSTRATION_PILLS[i % ILLUSTRATION_PILLS.length]}" stroke="${ink}" stroke-width="2.5"/>`);
+    out.push(`<text x="68" y="${y + 36}" font-size="25" font-family="${font}" fill="${ink}">${esc(label)}</text>`);
+    y += 68;
+  }
+
+  y += buttons.length ? 14 : 0;
+  for (const [i, button] of buttons.entries()) {
+    const label = wrap(button, 16)[0] ?? button;
+    out.push(`<rect x="44" y="${y}" width="344" height="56" rx="12" fill="${CARD_BUTTONS[i % CARD_BUTTONS.length]}" stroke="${ink}" stroke-width="3"/>`);
+    out.push(`<text x="216" y="${y + 38}" text-anchor="middle" font-size="26" font-family="${font}" fill="${ink}">${esc(label)}</text>`);
+    y += 70;
+  }
+
+  out.push(`</g>`);
+  return out.join("");
+}

@@ -106,7 +106,8 @@ ${drawnSoFar.map((d, n) => `${n + 1}. ${d}`).join("\n")}` : ""}`,
         const { notes, imagePrompt } = output;
         if (imagePrompt) drawnSoFar.push(imagePrompt);
         // Drawn before saving so the slide isn't rewritten under someone editing it.
-        if (imagePrompt && IMAGED.includes(card.layout)) {
+        // A card already fills the picture column, so an image here would be paid for and never seen.
+        if (imagePrompt && !card.card && IMAGED.includes(card.layout)) {
           try {
             const url = await drawIllustration(imagePrompt, `illustration-${i}`, `/decks/${deckId}`);
             if (url) card.image = { url, prompt: imagePrompt };

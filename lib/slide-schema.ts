@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import type { BinaryFiles } from "@excalidraw/excalidraw/types";
-import { ICONS, type Illustration } from "@/lib/doodles";
+import { ICONS, type Illustration, type SlideCard } from "@/lib/doodles";
 
 // Diagram pieces: used by the "diagram" layout and by legacy whiteboard slides.
 export const Node = z.object({
@@ -50,6 +50,7 @@ export type Drawing = { elements: readonly ExcalidrawElement[]; files: BinaryFil
 // Every layout can carry a doodle strip; the renderer shows it where there is room.
 export type SlideT = z.infer<typeof Slide> & {
   illustration?: Illustration | null;
+  card?: SlideCard | null;
   drawing?: Drawing | null;
   image?: SlideImage | null;
 };
@@ -83,12 +84,23 @@ export const SlideOutput = z.object({
     flow: z.boolean(),
     callout: z.string().nullable(),
   }).nullable(),
+  // A labelled mock-up of a real thing, drawn as vector beside the text.
+  card: z.object({
+    title: z.string().nullable(),
+    rows: z.array(z.string()).max(4),
+    buttons: z.array(z.string()).max(3),
+  }).nullable(),
   imagePrompt: z.string().nullable(),
   notes: z.string(),
 });
 
 export function toSlide(o: z.infer<typeof SlideOutput>): SlideT {
-  return { ...layoutSlide(o), illustration: ILLUSTRATED.includes(o.layout) ? o.illustration : null };
+  return {
+    ...layoutSlide(o),
+    illustration: ILLUSTRATED.includes(o.layout) ? o.illustration : null,
+    // A card needs the picture column, so only the layouts that have one may carry it.
+    card: IMAGED.includes(o.layout) && o.card?.rows.length ? o.card : null,
+  };
 }
 
 function layoutSlide(o: z.infer<typeof SlideOutput>): SlideT {

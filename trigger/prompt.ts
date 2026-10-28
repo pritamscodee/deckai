@@ -105,6 +105,17 @@ illustration (only for title, bullets, quote and stats; null for other layouts):
 - Set illustration on every title, bullets, quote and stats slide. Use null only when no icon in
   the set can honestly carry the idea.
 
+card (only for title, bullets and quote; null for other layouts):
+- A hand-drawn mock-up of one concrete thing the slide is about: an order, a profile,
+  a record, a form, a ticket, a receipt.
+- title: what the thing is, e.g. "Swiggy delivery" or "Zomato order"; or null.
+- rows: up to 4 short field labels in CAPITALS, e.g. "DRIVER NAME", "BIKE NUMBER", "RATING".
+- buttons: up to 3 short action labels in CAPITALS, e.g. "ACCEPT ORDER", "TRACK LOCATION".
+- Reach for this whenever the slide explains the parts of a thing. It is drawn as vector,
+  so its labels stay sharp and correctly spelled, which a generated image cannot promise.
+- Set card or imagePrompt, never both: the card takes the picture column. Leave card null
+  when the idea is a scene or a feeling rather than a labelled object.
+
 imagePrompt (only for title, bullets and quote; null for other layouts):
 - Describe one clear educational illustration in 1–2 sentences.
 - Match the current slide's exact key idea.

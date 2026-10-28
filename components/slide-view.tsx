@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useId, useState, type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { ILLUSTRATION_VIEWBOX, decorationMarkup, illustrationMarkup } from "@/lib/doodles";
+import { CARD_VIEWBOX, ILLUSTRATION_VIEWBOX, cardMarkup, decorationMarkup, illustrationMarkup } from "@/lib/doodles";
 import { DrawingLayer } from "@/components/slide-drawing";
 import type { SlideT, Theme } from "@/lib/slide-schema";
 
@@ -97,14 +97,28 @@ export function SlideView({ slide, theme, onEdit, hideDrawing, figure, className
 // Claude's illustration in a column beside the content. Once the slide has a drawing the picture
 // lives there (movable); the invisible <img> keeps the layout in place.
 function WithPicture({ slide, className, children }: { slide: SlideT; className?: string; children: ReactNode }) {
-  if (!slide.image) return <div className={className}>{children}</div>;
+  if (!slide.card && !slide.image) return <div className={className}>{children}</div>;
   return (
     <div className={cn("grid grid-cols-[3fr_2fr] gap-[2.5cqw]", className)}>
       {children}
-      {/* eslint-disable-next-line @next/next/no-img-element -- SVG data URL drawn by Claude */}
-      <img src={slide.image.url} alt={slide.image.prompt} data-drawing="image"
-        className={cn("size-full min-h-0 object-contain", slide.drawing && "invisible")} />
+      {/* A card is drawn rather than generated, so it wins the column when the slide has one. */}
+      {slide.card ? <CardPicture slide={slide} /> : (
+        /* eslint-disable-next-line @next/next/no-img-element -- generated illustration, not a local asset */
+        <img src={slide.image!.url} alt={slide.image!.prompt} data-drawing="image"
+          className={cn("size-full min-h-0 object-contain", slide.drawing && "invisible")} />
+      )}
     </div>
+  );
+}
+
+// The labelled mock-up: vector, so its text stays sharp and correctly spelled at any size.
+function CardPicture({ slide }: { slide: SlideT }) {
+  const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
+  if (!slide.card) return null;
+  return (
+    <svg viewBox={CARD_VIEWBOX} className={cn("size-full min-h-0", slide.drawing && "invisible")}
+      aria-hidden data-drawing="card"
+      dangerouslySetInnerHTML={{ __html: cardMarkup(slide.card, uid, "var(--slide-body)") }} />
   );
 }
 
