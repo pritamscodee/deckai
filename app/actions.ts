@@ -10,7 +10,7 @@ import type { generateDeck } from "@/trigger/generate-deck";
 import type { Prisma } from "@/lib/generated/prisma/client";
 import { isCardScene, Slide, slideText, THEMES, type SlideT, type Theme } from "@/lib/slide-schema";
 import { activePlan, canUseTheme, MIN_DECK_SLIDES, PLANS, PLAN_IDS, razorpayPlanId, subscriptionIsOpen, type PlanId } from "@/lib/plans";
-import { razorpay, verifyCheckout, type Subscription } from "@/lib/razorpay";
+import { keyId, razorpay, verifyCheckout, type Subscription } from "@/lib/razorpay";
 import { applySubscription } from "@/lib/billing";
 
 function slugify(text: string) {
@@ -151,7 +151,7 @@ export async function startSubscription(planId: PlanId) {
   // Saved now so webhooks for this subscription can find the user. If this write fails the
   // subscription's notes.userId still identifies them (see lib/billing.ts).
   await db.user.update({ where: { id }, data: { subscriptionId: sub.id, subscriptionStatus: sub.status } });
-  return { subscriptionId: sub.id, keyId: process.env.RAZORPAY_KEY_ID!, email: user.email, name: user.name };
+  return { subscriptionId: sub.id, keyId: keyId(), email: user.email, name: user.name };
 }
 
 // Moving between plans on the subscription that already exists — no second charge, no
