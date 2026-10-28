@@ -1,0 +1,15 @@
+trigger/prompt.ts
+  h_8dfeaef981cbe6 2-4,6-34,36-42,44-46,49,51-60,63-74,81-115
+  h_8dfeaef981cbe6 47-48,50,61-62,75
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c9ac65d584fe5afca08b0d62caa7387d7adede5f",
+  "prompts": {},
+  "humans": {
+    "h_8dfeaef981cbe6": {
+      "author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
