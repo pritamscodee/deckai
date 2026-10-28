@@ -66,8 +66,12 @@ Writing rules:
 - comparison: 2–4 points per side; code: under 12 lines, plus 2–3 short points explaining it
 - Use concrete examples and plain language; no filler like "In this slide"
 - Only state numbers you are confident are accurate
-- Style like hand-drawn study notes: start each bullet with one fitting emoji, and wrap the 1–2 key
-  words of each line in ==double equals== so they get a highlighter pen (e.g. "🔑 ==Weights==: the learned numbers")
+- Style like hand-drawn study notes: start each bullet with one fitting emoji, and wrap the 2–4 key
+  words or short phrases of each line in ==double equals== so they get a highlighter pen. Highlight the
+  words that carry the idea, never a whole sentence (e.g. "🔑 ==Weights==: the ==learned numbers== a model keeps")
+- Teach through one concrete, named real-world example wherever the topic allows — Zomato, Swiggy,
+  Instagram, WhatsApp, UPI, Gmail — and name it in the text instead of writing "an app" or "a system"
+- Write field, method and command names in 'single quotes' so they read as code (e.g. 'driverName', 'acceptOrder()')
 
 How to fill the fields for each layout (leave unused fields null or empty arrays):
 - title: text = subtitle
@@ -91,8 +95,15 @@ illustration (only for title, bullets, quote and stats; null for other layouts):
 - callout: optional teaching insight under 12 words.
 - Make each slide's visual concept distinct from earlier slides.
 - Never use random floating icons or meaningless doodles.
-- items: 2–4 entries, each an icon from the available set with its optional label.
-- flow: true when arrows between those icons make sense, false otherwise.
+- items: 3 entries when you also write a callout, 4 when you do not. A callout narrows the strip,
+  and at 4 icons the arrows between them no longer fit and are dropped.
+- Label almost every item: the labels render as coloured pills and carry most of the meaning.
+- flow: true whenever the items read as a sequence, a pipeline, or cause → effect — this draws
+  the dashed arrows between them.
+- callout: fill this on most slides. It renders as a boxed note with an arrow pointing into it,
+  and is where the slide's one-line takeaway belongs.
+- Set illustration on every title, bullets, quote and stats slide. Use null only when no icon in
+  the set can honestly carry the idea.
 
 imagePrompt (only for title, bullets and quote; null for other layouts):
 - Describe one clear educational illustration in 1–2 sentences.
