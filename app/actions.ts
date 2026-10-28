@@ -18,6 +18,13 @@ function slugify(text: string) {
   return `${base || "deck"}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+// A queue failure is always configuration, and the cause has to reach whoever is looking.
+// Trimmed because it lands in a user-facing sentence, not a log line.
+function queueReason(err: unknown) {
+  const text = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+  return text.replace(/\s+/g, " ").trim().slice(0, 160) || "no error message";
+}
+
 export async function createDeck(formData: FormData) {
   const { id } = await requireUser();
   const prompt = String(formData.get("prompt") ?? "").trim();
@@ -43,9 +50,10 @@ export async function createDeck(formData: FormData) {
     // The user gets a calm message, but the cause has to reach the server log: a queue
     // failure is always configuration (key, environment, deployment), never a one-off.
     console.error("[trigger] could not queue deck", { deckId: deck.id, err: String(err) });
+    const why = queueReason(err);
     // Nothing was generated, so the deck shouldn't count against the month.
     await db.$transaction([
-      db.deck.update({ where: { id: deck.id }, data: { status: "FAILED", error: "The deck couldn't be queued. Nothing was counted against your plan — try again." } }),
+      db.deck.update({ where: { id: deck.id }, data: { status: "FAILED", error: `The deck couldn't be queued. Nothing was counted against your plan — try again. (${why})` } }),
       db.user.update({ where: { id }, data: { decksUsed: { decrement: 1 } } }),
     ]);
   }
@@ -79,7 +87,8 @@ export async function retryDeck(deckId: string) {
     await db.deck.update({ where: { id: deck.id }, data: { runId: handle.id } });
   } catch (err) {
     console.error("[trigger] could not re-queue deck", { deckId: deck.id, err: String(err) });
-    await db.deck.update({ where: { id: deck.id }, data: { status: "FAILED", error: "Couldn't start generating again. Nothing was counted against your plan." } });
+    const why = queueReason(err);
+    await db.deck.update({ where: { id: deck.id }, data: { status: "FAILED", error: `Couldn't start generating again. Nothing was counted against your plan. (${why})` } });
     if (recharge) await db.user.updateMany({ where: { id: owner.id, decksUsed: { gt: 0 } }, data: { decksUsed: { decrement: 1 } } });
   }
   revalidatePath(`/decks/${deck.id}`);
