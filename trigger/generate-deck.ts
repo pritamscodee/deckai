@@ -96,7 +96,8 @@ export const generateDeck = task({
 Slide ${i + 1} of ${outline.slides.length}
 Title: ${s.title}
 Key idea: ${s.keyIdea}
-Layout: ${s.layout}${drawnSoFar.length ? `
+Layout: ${s.layout}
+Planned visual: ${s.visual ?? "none"}${drawnSoFar.length ? `
 
 Illustrations already used earlier in this deck. Choose a different subject and
 composition; do not draw any of these again:

@@ -41,6 +41,16 @@ VISUAL PLANNING:
 - Reserve statistics for accurate, relevant numbers.
 - Do not force illustrations into ideas they cannot clarify.
 
+VISUAL PLAN (the field "visual" on each slide):
+- You are the only step that sees the whole deck at once, so you decide every picture here.
+- Give each slide a one-line visual concept naming its main subject, or null when the slide
+  needs no picture.
+- No two slides may share a main subject. If two slides would both show stacked blocks, a
+  plant, or a robot, change one of them. Reuse of a subject is a mistake, not a style.
+- Vary the kind of picture across the deck as well as the subject: an object, a process, a
+  comparison, a labelled record, a person doing something.
+- Name concrete things, not abstractions: "a printer refusing a fax job", not "flexibility".
+
 STRUCTURAL VARIETY:
 - Do not fall back on one default running order. Two decks on different
   topics must not share the same sequence of layouts.
@@ -117,6 +127,9 @@ card (only for title, bullets and quote; null for other layouts):
   when the idea is a scene or a feeling rather than a labelled object.
 
 imagePrompt (only for title, bullets and quote; null for other layouts):
+- The outline already chose this slide's picture and gave it to you as "Planned visual".
+  Expand that subject into 1–2 sentences. Do not substitute a different subject, and set
+  null when the plan says none — the plan is what keeps the deck's pictures distinct.
 - Describe one clear educational illustration in 1–2 sentences.
 - Match the current slide's exact key idea.
 - Use a hand-drawn notebook or technical whiteboard sketch.

@@ -131,7 +131,11 @@ export const isCardScene = (scene: unknown): scene is CardScene =>
 
 export const Outline = z.object({
   deckTitle: z.string(),
-  slides: z.array(z.object({ title: z.string(), keyIdea: z.string(), layout: z.enum(LAYOUTS) })).min(3).max(15),
+  // visual is planned here, not per slide: the outline is the only call that sees the whole
+  // deck at once, so it is the only place that can guarantee no two slides draw the same thing.
+  slides: z.array(z.object({
+    title: z.string(), keyIdea: z.string(), layout: z.enum(LAYOUTS), visual: z.string().nullable(),
+  })).min(3).max(15),
 });
 
 export const THEMES = ["notebook", "clean", "midnight"] as const;
