@@ -4,8 +4,19 @@ import { nextCookies } from "better-auth/next-js";
 import { db } from "@/lib/db";
 import { resetPasswordEmail, sendEmail } from "@/lib/email";
 
+// better-auth answers "Invalid origin" with a 403 when a request's Origin isn't its baseURL
+// (BETTER_AUTH_URL). The site is reachable on the apex, on www and on the vercel.app alias,
+// and every preview deploy gets its own hostname, so the alternates must be named.
+// BETTER_AUTH_TRUSTED_ORIGINS is a comma-separated list, so origins can be added without a
+// code change; VERCEL_URL covers preview deploys automatically.
+const trustedOrigins = [
+  ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS ?? "").split(",").map((o) => o.trim()).filter(Boolean),
+  ...(process.env.VERCEL_URL ? [`https://${process.env.VERCEL_URL}`] : []),
+];
+
 export const auth = betterAuth({
   database: prismaAdapter(db, { provider: "postgresql" }),
+  trustedOrigins,
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
