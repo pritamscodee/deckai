@@ -37,6 +37,27 @@ function isOutOfCredit(err: unknown): boolean {
   return APICallError.isInstance(e) && /credit balance|billing/i.test(e.responseBody ?? e.message);
 }
 
+// Asking for distinct subjects is not enough: "stacked blocks" and "a tower of blocks" come
+// back as different strings for the same picture. Compare the content words instead, so a
+// repeat is caught by what it draws rather than by how it is worded.
+const SUBJECT_STOPWORDS = new Set([
+  "a", "an", "the", "and", "or", "of", "in", "on", "to", "for", "with", "its", "their", "that",
+  "this", "is", "are", "showing", "shows", "show", "illustration", "drawing", "sketch", "image",
+  "simple", "clear", "hand", "drawn", "style", "one", "two", "three", "each", "into", "from",
+]);
+
+const subjectWords = (text: string) =>
+  new Set(
+    text.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/)
+      .filter(word => word.length > 2 && !SUBJECT_STOPWORDS.has(word)),
+  );
+
+// Two shared content words is a repeat in practice; with a very short subject, one is enough.
+const sameSubject = (a: Set<string>, b: Set<string>) => {
+  const shared = [...a].filter(word => b.has(word)).length;
+  return shared >= 2 || (shared >= 1 && Math.min(a.size, b.size) <= 2);
+};
+
 export const generateDeck = task({
   id: "generate-deck",
   maxDuration: 600,
@@ -54,13 +75,14 @@ export const generateDeck = task({
     // ends up with the same subject drawn on several slides. Seeded on a retry from the
     // slides already saved, so continuing a deck doesn't start the comparison over.
     const drawnSoFar: string[] = [];
+    const drawnSubjects: Set<string>[] = [];
     if (done.size) {
       const saved = await db.slide.findMany({
         where: { deckId }, orderBy: { order: "asc" }, select: { scene: true },
       });
       for (const row of saved) {
         const prompt = (row.scene as { slide?: { image?: { prompt?: string } } })?.slide?.image?.prompt;
-        if (prompt) drawnSoFar.push(prompt);
+        if (prompt) { drawnSoFar.push(prompt); drawnSubjects.push(subjectWords(prompt)); }
       }
     }
 
@@ -107,11 +129,16 @@ ${drawnSoFar.map((d, n) => `${n + 1}. ${d}`).join("\n")}` : ""}`,
         const { notes, imagePrompt } = output;
         if (imagePrompt) drawnSoFar.push(imagePrompt);
         // Drawn before saving so the slide isn't rewritten under someone editing it.
+        // Last line of defence on repeats: the deck would rather have one picture than the
+        // same picture twice, so a repeated subject is dropped instead of drawn again.
+        const subject = imagePrompt ? subjectWords(imagePrompt) : null;
+        const repeats = !!subject && drawnSubjects.some(seen => sameSubject(subject, seen));
+        if (repeats) logger.warn("Illustration repeats an earlier subject, skipping", { slide: i, imagePrompt });
         // A card already fills the picture column, so an image here would be paid for and never seen.
-        if (imagePrompt && !card.card && IMAGED.includes(card.layout)) {
+        if (imagePrompt && !repeats && !card.card && IMAGED.includes(card.layout)) {
           try {
             const url = await drawIllustration(imagePrompt, `illustration-${i}`, `/decks/${deckId}`);
-            if (url) card.image = { url, prompt: imagePrompt };
+            if (url) { card.image = { url, prompt: imagePrompt }; drawnSubjects.push(subject!); }
           } catch (err) {
             if (isOutOfCredit(err)) throw err;
             logger.warn("Illustration failed", { slide: i, err: String(err) });  // the slide is fine without it
