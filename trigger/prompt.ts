@@ -43,8 +43,8 @@ VISUAL PLANNING:
 
 VISUAL PLAN (the field "visual" on each slide):
 - You are the only step that sees the whole deck at once, so you decide every picture here.
-- Give each slide a one-line visual concept naming its main subject, or null when the slide
-  needs no picture.
+- Give every slide a one-line visual concept naming its main subject. Every slide is
+  illustrated, so none may be left without one.
 - No two slides may share a main subject. If two slides would both show stacked blocks, a
   plant, or a robot, change one of them. Reuse of a subject is a mistake, not a style.
 - Vary the kind of picture across the deck as well as the subject: an object, a process, a
@@ -94,39 +94,7 @@ How to fill the fields for each layout (leave unused fields null or empty arrays
 - code: text = the code; caption = language name; items[].body = 2–3 short points explaining it
 - diagram: nodes and edges; caption = optional one-line takeaway
 
-illustration (only for title, bullets, quote and stats; null for other layouts):
-- Create a miniature hand-drawn teaching sketch.
-- Include 2–4 meaningful objects or concepts related
-  directly to the slide's key idea.
-- Arrange objects left to right when explaining a process.
-- Use arrows only to represent real relationships or flows.
-- Use labels of 1–3 words when useful, or null.
-- Use person only when a human action is relevant.
-- callout: optional teaching insight under 12 words.
-- Make each slide's visual concept distinct from earlier slides.
-- Never use random floating icons or meaningless doodles.
-- items: 3 entries when you also write a callout, 4 when you do not. A callout narrows the strip,
-  and at 4 icons the arrows between them no longer fit and are dropped.
-- Label almost every item: the labels render as coloured pills and carry most of the meaning.
-- flow: true whenever the items read as a sequence, a pipeline, or cause → effect — this draws
-  the dashed arrows between them.
-- callout: fill this on most slides. It renders as a boxed note with an arrow pointing into it,
-  and is where the slide's one-line takeaway belongs.
-- Set illustration on every title, bullets, quote and stats slide. Use null only when no icon in
-  the set can honestly carry the idea.
-
-card (only for title, bullets and quote; null for other layouts):
-- A hand-drawn mock-up of one concrete thing the slide is about: an order, a profile,
-  a record, a form, a ticket, a receipt.
-- title: what the thing is, e.g. "Swiggy delivery" or "Zomato order"; or null.
-- rows: up to 4 short field labels in CAPITALS, e.g. "DRIVER NAME", "BIKE NUMBER", "RATING".
-- buttons: up to 3 short action labels in CAPITALS, e.g. "ACCEPT ORDER", "TRACK LOCATION".
-- Reach for this whenever the slide explains the parts of a thing. It is drawn as vector,
-  so its labels stay sharp and correctly spelled, which a generated image cannot promise.
-- Set card or imagePrompt, never both: the card takes the picture column. Leave card null
-  when the idea is a scene or a feeling rather than a labelled object.
-
-imagePrompt (only for title, bullets and quote; null for other layouts):
+imagePrompt (REQUIRED on every slide, whatever its layout):
 - The outline already chose this slide's picture and gave it to you as "Planned visual".
   Expand that subject into 1–2 sentences. Do not substitute a different subject, and set
   null when the plan says none — the plan is what keeps the deck's pictures distinct.
@@ -140,8 +108,8 @@ imagePrompt (only for title, bullets and quote; null for other layouts):
   unless they genuinely explain the topic.
 - Do not repeat a previous slide's illustration concept.
 - Do not include text, labels, letters, numbers, or logos.
-- Return null when an image adds no teaching value,
-  except for the title slide where it is strongly preferred.
+- Never return null. Every slide carries a drawn illustration, so find the picture that
+  teaches this slide's idea rather than falling back to no image.
 
 Diagram layout only (1600x900 canvas):
 - The title is drawn at the top; keep nodes between y=160 and y=800

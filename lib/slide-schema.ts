@@ -54,12 +54,16 @@ export type SlideT = z.infer<typeof Slide> & {
   drawing?: Drawing | null;
   image?: SlideImage | null;
 };
-export const ILLUSTRATED: SlideT["layout"][] = ["title", "bullets", "quote", "stats"];
+// The doodle strip is off: its small icons read as clutter next to a drawn illustration, and
+// every slide now carries a real picture instead. Restore the layout list to bring it back.
+export const ILLUSTRATED: SlideT["layout"][] = [];
 
 // Illustration Claude drew for the slide, shown beside the content; only these layouts have room.
 // url points at the illustration on ImageKit, drawn by OpenAI's image model.
 export type SlideImage = { url: string; prompt: string };
-export const IMAGED: SlideT["layout"][] = ["title", "bullets", "quote"];
+// Every layout gets a drawn illustration. The picture column exists on all of them, so this
+// is a list of which layouts ask for one, not a limit of the renderer.
+export const IMAGED: SlideT["layout"][] = [...LAYOUTS];
 
 // Text may mark key words as ==highlighted==; strip the marks for plain text.
 export const plain = (s: string) => s.replace(/==/g, "");
@@ -99,7 +103,9 @@ export function toSlide(o: z.infer<typeof SlideOutput>): SlideT {
     ...layoutSlide(o),
     illustration: ILLUSTRATED.includes(o.layout) ? o.illustration : null,
     // A card needs the picture column, so only the layouts that have one may carry it.
-    card: IMAGED.includes(o.layout) && o.card?.rows.length ? o.card : null,
+    // A card would take the picture column that the illustration now owns on every slide.
+    // Change this back to o.card to put labelled cards back in play.
+    card: null,
   };
 }
 

@@ -12,21 +12,22 @@ import { ILLUSTRATION_STYLE, OUTLINE_INSTRUCTION, SLIDE_INSTRUCTION } from "./pr
 // Haiku is the lowest-cost Claude model.
 const model = anthropic("claude-haiku-5-5");
 
-// Illustrations come from OpenAI's image model. gpt-image-1.5 at "medium" was chosen against
-// gpt-image-1-mini and gpt-image-2 on the same prompt: it draws the subject surrounded by the
-// related objects the style asks for, which is the look the decks want. gpt-image-2 was ruled
-// out outright — it refuses transparent backgrounds, so every illustration would arrive as a
-// white rectangle on the notebook paper. Costs about 4s more per slide than the mini model.
-// The bytes go to ImageKit rather than into the slide as a data URI: the scene JSON is
-// capped (see saveSlide) and a deck's worth of inline images would bloat every row.
+// Illustrations come from OpenAI's image model, one per slide. The model is chosen by unit
+// economics rather than looks: measured against the API, gpt-image-1-mini at "low" costs 272
+// output tokens at $8/1M (about Rs 0.19 an image), while gpt-image-1.5 at "medium" costs 1056
+// tokens at $32/1M — roughly 15x. With an image on every slide, 1.5 would cost about Rs 594
+// of images against Rs 199 of revenue on the Starter plan (see lib/plans.ts).
+//
+// gpt-image-2 is not an option at any price: it refuses transparent backgrounds, so every
+// illustration would land as a white rectangle on the notebook paper.
 async function drawIllustration(prompt: string, baseName: string, folder: string) {
   const { image, warnings } = await generateImage({
-    model: openai.image("gpt-image-1.5"),
+    model: openai.image("gpt-image-1-mini"),
     prompt: `${ILLUSTRATION_STYLE}
 
 Draw this scene: ${prompt}`,
     size: "1024x1024",
-    providerOptions: { openai: { quality: "medium", background: "transparent", outputFormat: "webp" } },
+    providerOptions: { openai: { quality: "low", background: "transparent", outputFormat: "webp" } },
   });
   // A dropped option (transparency, webp) still yields a usable picture, so it's a note not a failure.
   if (warnings.length) logger.warn("Illustration options not applied", { warnings });

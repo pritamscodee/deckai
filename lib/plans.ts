@@ -33,8 +33,14 @@ export const PLANS: Record<PlanId, Plan> = {
   },
 };
 
-// Priced so a subscriber who uses the whole allowance still leaves ~55-60% after GST and Razorpay fees:
-// a slide costs about ₹0.20 to make (Claude Haiku 5.5 + its illustration + Trigger.dev compute).
+// Priced so a subscriber who uses the whole allowance still leaves a healthy margin after GST
+// and Razorpay fees. Every slide now carries a drawn illustration, which is the dominant cost:
+// gpt-image-1-mini at "low" is 272 output tokens at $8/1M, about ₹0.19 an image, so a slide
+// costs roughly ₹0.25 all in (illustration + Claude Haiku + Trigger.dev compute).
+//
+// The illustration model is load-bearing for these prices. gpt-image-1.5 at "medium" is ~15x
+// dearer (₹3.00 a slide), which would cost ₹594 of images against ₹199 of Starter revenue.
+// Changing the model in trigger/generate-deck.ts means revisiting these numbers.
 export const FROM_PRICE = PLANS.starter.price;
 
 // The smallest deck the outline ever plans; a deck is only started when this many slides are left.
