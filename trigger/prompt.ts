@@ -46,7 +46,29 @@ Return a short, specific deckTitle and the ordered slide outline.
 
 
 
-export const SLIDE_INSTRUCTION = `
+export const SLIDE_INSTRUCTION = `You write ONE slide of a teaching deck, like a polished Gamma card.
+
+Writing rules:
+- Use the requested layout unless it clearly does not fit the idea
+- Be concise: headings under 7 words, bullets under 15 words, card bodies under 25 words
+- bullets: 3–5 items; cards: 2–4 items with a single fitting emoji each; stats: 2–4; timeline: 3–6 steps
+- comparison: 2–4 points per side; code: under 12 lines, plus 2–3 short points explaining it
+- Use concrete examples and plain language; no filler like "In this slide"
+- Only state numbers you are confident are accurate
+- Style like hand-drawn study notes: start each bullet with one fitting emoji, and wrap the 1–2 key
+  words of each line in ==double equals== so they get a highlighter pen (e.g. "🔑 ==Weights==: the learned numbers")
+
+How to fill the fields for each layout (leave unused fields null or empty arrays):
+- title: text = subtitle
+- bullets: text = optional one-line intro; items[].body = each bullet
+- cards: items[] = { emoji, heading, body }
+- stats: items[].heading = the number (e.g. "73%"), items[].body = what it measures; caption = optional source/context
+- timeline: items[] = { heading, body } in order
+- comparison: exactly 2 items, one per side: { heading, points }
+- quote: text = the quote; caption = who said it (or null)
+- code: text = the code; caption = language name; items[].body = 2–3 short points explaining it
+- diagram: nodes and edges; caption = optional one-line takeaway
+
 illustration (only for title, bullets, quote and stats; null for other layouts):
 - Create a miniature hand-drawn teaching sketch.
 - Include 2–4 meaningful objects or concepts related
@@ -58,6 +80,8 @@ illustration (only for title, bullets, quote and stats; null for other layouts):
 - callout: optional teaching insight under 12 words.
 - Make each slide's visual concept distinct from earlier slides.
 - Never use random floating icons or meaningless doodles.
+- items: 2–4 entries, each an icon from the available set with its optional label.
+- flow: true when arrows between those icons make sense, false otherwise.
 
 imagePrompt (only for title, bullets and quote; null for other layouts):
 - Describe one clear educational illustration in 1–2 sentences.
@@ -72,7 +96,15 @@ imagePrompt (only for title, bullets and quote; null for other layouts):
 - Do not include text, labels, letters, numbers, or logos.
 - Return null when an image adds no teaching value,
   except for the title slide where it is strongly preferred.
-`;
+
+Diagram layout only (1600x900 canvas):
+- The title is drawn at the top; keep nodes between y=160 and y=800
+- Flow left to right; at least 60px between nodes, never overlap
+- Shapes default to 240x110 (w/h may be null); keep x+w <= 1560 and y+h <= 840
+- Labels under 6 words; at most 8 nodes
+- Every edge must reference existing node ids
+
+notes: 2–4 sentences the presenter can say aloud.`;
 
 
 // Style preamble for the image model. OpenAI's gpt-image-1-mini draws the picture itself, so
